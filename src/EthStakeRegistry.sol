@@ -8,7 +8,7 @@ import { EthStakingContract } from "./EthStakingContract.sol";
 import { IEthStakeRegistry } from "./interface/IEthStakeRegistry.sol";
 import { IEthStakeHooks } from "../src/interface/IEthStakeHooks.sol";
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import { Error } from "./Utils/Error.sol";
+import { Error } from "./utils/Error.sol";
 
 contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     IBlast public immutable BLAST;

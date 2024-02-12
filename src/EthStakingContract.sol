@@ -5,7 +5,7 @@ import { IBlast, YieldMode, GasMode } from "./interface/IBlast.sol";
 import { IBlastPoints } from "./interface/IBlastPoints.sol";
 import { IEthStakeRegistry } from "./interface/IEthStakeRegistry.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import { Error } from "./Utils/Error.sol";
+import { Error } from "./utils/Error.sol";
 
 contract EthStakingContract is Initializable, IBlastPoints, Error {
     address public serviceContract;
