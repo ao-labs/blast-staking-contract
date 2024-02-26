@@ -22,8 +22,7 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     event Log(string reason);
     event LogBytes(bytes reason);
 
-    // @TODO determine whether 300k is reasonable
-    uint256 public constant MAX_GAS_LIMIT = 300_000; // @dev gas limit for hooks
+    uint256 public constant MAX_GAS_LIMIT = 3_000_000;
 
     /* ============ Constructor ============ */
 
