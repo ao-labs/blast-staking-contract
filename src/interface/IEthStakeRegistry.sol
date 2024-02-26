@@ -6,6 +6,4 @@ interface IEthStakeRegistry {
     function getUserStakingContractBalance(address service, address user) external view returns (uint256);
     function stake(address user, bytes memory data) external payable;
     function unstake(address user, address payable to, uint256 amount, bytes memory data) external;
-    function setBlastPointsAdmin(address admin) external;
-    function getBlastPointsAdmin(address service) external view returns (address);
 }

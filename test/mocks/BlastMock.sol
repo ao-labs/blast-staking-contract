@@ -2,6 +2,8 @@
 // solhint-disable
 pragma solidity >=0.8.23 <0.9.0;
 
+import { IBlastPoints } from "../../src/interface/IBlastPoints.sol";
+
 enum GasMode {
     VOID,
     CLAIMABLE
@@ -236,5 +238,17 @@ contract BlastMock is IBlast {
     {
         // do nothing
         return (0, 0, 0, GasMode.VOID);
+    }
+}
+
+contract BlastPoints is IBlastPoints {
+    mapping(address => address) public pointsOperators;
+
+    function getPointsOperator(address user) external view returns (address) {
+        return pointsOperators[user];
+    }
+
+    function configurePointsOperator(address operator) external {
+        pointsOperators[msg.sender] = operator;
     }
 }

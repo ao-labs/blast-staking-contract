@@ -7,7 +7,7 @@ import { IEthStakeRegistry } from "./interface/IEthStakeRegistry.sol";
 import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import { Error } from "./utils/Error.sol";
 
-contract EthStakingContract is Initializable, IBlastPoints, Error {
+contract EthStakingContract is Initializable, Error {
     address public serviceContract;
     address public stakeRegistry;
 
@@ -16,10 +16,19 @@ contract EthStakingContract is Initializable, IBlastPoints, Error {
 
     /* ============ Initializer ============ */
 
-    function init(address blast, address _serviceContract) public initializer {
+    function init(
+        address blast,
+        address blastPoints,
+        address _serviceContract,
+        address pointsOperator
+    )
+        public
+        initializer
+    {
         stakeRegistry = msg.sender;
         serviceContract = _serviceContract;
         IBlast(blast).configureContract(address(this), YieldMode.AUTOMATIC, GasMode.CLAIMABLE, stakeRegistry);
+        IBlastPoints(blastPoints).configurePointsOperator(pointsOperator);
     }
 
     /* ============ Modifier ============ */
@@ -40,11 +49,5 @@ contract EthStakingContract is Initializable, IBlastPoints, Error {
     function withdraw(address payable to, uint256 amount) external onlyStakeRegistry {
         to.transfer(amount);
         emit Withdraw(to, amount);
-    }
-
-    /* ============ Blast Points Function ============ */
-
-    function blastPointsAdmin() external view override returns (address) {
-        return IEthStakeRegistry(stakeRegistry).getBlastPointsAdmin(serviceContract);
     }
 }

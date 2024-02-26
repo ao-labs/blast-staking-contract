@@ -8,27 +8,39 @@ import { EthStakeRegistry } from "../src/EthStakeRegistry.sol";
 import { StakeHookChecker } from "./mocks/StakeHookChecker.sol";
 import { StakeHookError } from "./mocks/StakeHookError.sol";
 import { IBlast } from "./mocks/BlastMock.sol";
-import { BlastMock } from "./mocks/BlastMock.sol";
+import { BlastMock, BlastPoints } from "./mocks/BlastMock.sol";
 
 contract EthStakeRegistryTest is PRBTest, StdCheats {
     EthStakeRegistry internal ethStakeRegistry;
     address public governor;
+    address public blastPointsOperator;
     address public service;
     address public user1;
     address public user2;
     IBlast public blast;
+    BlastPoints public blastPoints;
 
     function setUp() public virtual {
         // @dev Yeild related functions reverts when testing with a fork
         // @TODO When problem fixes, uncomment
-        // vm.createSelectFork({ urlOrAlias: "blast_sepolia", blockNumber: 1_518_004 });
+        // vm.createSelectFork({ urlOrAlias: "blast_sepolia", blockNumber: 2_121_800 });
         // blast = IBlast(vm.envOr("BLAST_CONTRACT_ADDRESS", address(0x4300000000000000000000000000000000000002)));
         blast = new BlastMock();
+        blastPoints = new BlastPoints();
         governor = vm.addr(1);
-        service = vm.addr(2);
-        user1 = vm.addr(3);
-        user2 = vm.addr(4);
-        ethStakeRegistry = new EthStakeRegistry(address(blast), governor);
+        blastPointsOperator = vm.addr(2);
+        service = vm.addr(3);
+        user1 = vm.addr(4);
+        user2 = vm.addr(5);
+        ethStakeRegistry = new EthStakeRegistry(address(blast), address(blastPoints), governor, blastPointsOperator);
+    }
+
+    function test_Constructor() external {
+        assertEq(address(ethStakeRegistry.BLAST()), address(blast));
+        assertEq(address(ethStakeRegistry.BLAST_POINTS()), address(blastPoints));
+        assertEq(ethStakeRegistry.owner(), governor);
+        assertEq(ethStakeRegistry.BLAST_POINTS_OPERATOR(), blastPointsOperator);
+        assertEq(blastPoints.getPointsOperator(address(ethStakeRegistry)), blastPointsOperator);
     }
 
     function test_Stake() external {
@@ -39,6 +51,11 @@ contract EthStakeRegistryTest is PRBTest, StdCheats {
         assertEq(ethStakeRegistry.getUserStakingContractBalance(service, user1), 100);
         assertEq(ethStakeRegistry.getUserStakingContract(service, user1).balance, 100);
         assertEq(user1.balance, 0);
+
+        // check if points operator is set
+        assertEq(
+            blastPoints.getPointsOperator(ethStakeRegistry.getUserStakingContract(service, user1)), blastPointsOperator
+        );
     }
 
     function test_Withdraw() external {

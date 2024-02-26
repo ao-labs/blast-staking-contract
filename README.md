@@ -13,7 +13,7 @@ Users maintain control over their assets, with no service intervention in stakin
 #### Hooks
 Services can adopt the IEthStakeHooks interface to utilize a sophisticated hook system, facilitating custom actions before and after staking or unstaking. This allows for enriched service interactions tailored to specific user activities.
 #### Blast Points Administration
-By designating a Blast Points admin via setBlastPointsAdmin, services gain the capability to claim Blast Points. This feature empowers services to distribute rewards among users, enhancing the overall staking experience and incentivizing participation.
+By designating a Blast Points admin via setBlastPointsOperator, services gain the capability to claim Blast Points. This feature empowers services to distribute rewards among users, enhancing the overall staking experience and incentivizing participation.
 
 
 ### Environment Setup

@@ -4,6 +4,7 @@ pragma solidity >=0.8.23 <0.9.0;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
 import { IBlast } from "./interface/IBlast.sol";
+import { IBlastPoints } from "./interface/IBlastPoints.sol";
 import { EthStakingContract } from "./EthStakingContract.sol";
 import { IEthStakeRegistry } from "./interface/IEthStakeRegistry.sol";
 import { IEthStakeHooks } from "../src/interface/IEthStakeHooks.sol";
@@ -12,11 +13,10 @@ import { Error } from "./utils/Error.sol";
 
 contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     IBlast public immutable BLAST;
+    IBlastPoints public immutable BLAST_POINTS;
     address public immutable STAKING_CONTRACT_IMPLEMENTATION;
+    address public immutable BLAST_POINTS_OPERATOR;
 
-    mapping(address service => address blastPointsAdmin) public serviceToBlastPointsAdmin;
-
-    event SetBlastPointsAdmin(address service, address blastPointsAdmin);
     event Stake(address indexed service, address indexed user, uint256 amount);
     event Unstake(address indexed service, address indexed user, address indexed to, uint256 amount);
     event Log(string reason);
@@ -26,11 +26,22 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
 
     /* ============ Constructor ============ */
 
-    constructor(address blast, address gasCollector) payable Ownable(gasCollector) {
+    constructor(
+        address blast,
+        address blastPoints,
+        address gasCollector,
+        address pointsOperator
+    )
+        payable
+        Ownable(gasCollector)
+    {
         STAKING_CONTRACT_IMPLEMENTATION = address(new EthStakingContract());
+        BLAST_POINTS_OPERATOR = pointsOperator;
         BLAST = IBlast(blast);
         BLAST.configureClaimableGas();
         BLAST.configureGovernor(gasCollector);
+        BLAST_POINTS = IBlastPoints(blastPoints);
+        BLAST_POINTS.configurePointsOperator(pointsOperator);
     }
 
     /* ============ Admin Gas Functions ============ */
@@ -44,11 +55,6 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     }
 
     /* ============ External Functions ============ */
-
-    function setBlastPointsAdmin(address blastPointsAdmin) external {
-        serviceToBlastPointsAdmin[msg.sender] = blastPointsAdmin;
-        emit SetBlastPointsAdmin(msg.sender, blastPointsAdmin);
-    }
 
     function stake(address service, bytes memory data) external payable {
         if (msg.value == 0) {
@@ -77,10 +83,6 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
 
     /* ============ View Functions ============ */
 
-    function getBlastPointsAdmin(address service) external view returns (address) {
-        return serviceToBlastPointsAdmin[service];
-    }
-
     function getUserStakingContract(address service, address user) public view returns (address) {
         return Clones.predictDeterministicAddress(
             STAKING_CONTRACT_IMPLEMENTATION, keccak256(abi.encodePacked(service, user))
@@ -105,7 +107,7 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     function _deployStakingContract(address service, address user) internal {
         address stakingContract =
             Clones.cloneDeterministic(STAKING_CONTRACT_IMPLEMENTATION, keccak256(abi.encodePacked(service, user)));
-        EthStakingContract(stakingContract).init(address(BLAST), service);
+        EthStakingContract(stakingContract).init(address(BLAST), address(BLAST_POINTS), service, BLAST_POINTS_OPERATOR);
     }
 
     function _beforeStake(address service, address user, uint256 amount, bytes memory data) internal {
