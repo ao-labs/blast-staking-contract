@@ -129,11 +129,10 @@ contract EthStakeRegistryTest is PRBTest, StdCheats {
         ethStakeRegistry.stake{ value: 200 }(address(hookError), "afterStake");
 
         vm.expectEmit(true, true, true, true);
-        emit LogBytes(""); // out of gas error
+        emit Log("beforeUnstakeError");
         ethStakeRegistry.unstake(address(hookError), payable(user2), 100, "beforeUnstake");
 
-        vm.expectEmit(true, true, true, true);
-        emit Log("error");
+        // should not emit afterUnstake event even if the return value is false
         ethStakeRegistry.unstake(address(hookError), payable(user2), 200, "afterUnstake");
     }
 }

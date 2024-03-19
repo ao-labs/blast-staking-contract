@@ -17,8 +17,8 @@ contract StakeHookError is IEthStakeHooks, ERC165 {
     }
 
     function beforeUnstake(address user, uint256 amount, bytes memory data) external override returns (bool) {
-        for (uint256 i = 0; i < 100_000_000; i++) {
-            keccak256("use up some gas");
+        assembly {
+            revert(0, 100000000)
         }
         return true;
     }
