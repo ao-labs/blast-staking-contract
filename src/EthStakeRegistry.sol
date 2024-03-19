@@ -32,7 +32,6 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
         address gasCollector,
         address pointsOperator
     )
-        payable
         Ownable(gasCollector)
     {
         STAKING_CONTRACT_IMPLEMENTATION = address(new EthStakingContract());

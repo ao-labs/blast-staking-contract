@@ -14,6 +14,11 @@ contract EthStakingContract is Initializable, Error {
     event Deposit(uint256 amount);
     event Withdraw(address to, uint256 amount);
 
+    /* ============ Constructor ============ */
+    constructor() {
+        _disableInitializers();
+    }
+
     /* ============ Initializer ============ */
 
     function init(
