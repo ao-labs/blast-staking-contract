@@ -47,7 +47,10 @@ contract EthStakingContract is Initializable, Error {
     }
 
     function withdraw(address payable to, uint256 amount) external onlyStakeRegistry {
-        to.transfer(amount);
+        (bool success,) = to.call{ value: amount }("");
+        if (!success) {
+            revert WithdrawalFailed();
+        }
         emit Withdraw(to, amount);
     }
 }

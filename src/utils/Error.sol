@@ -6,4 +6,5 @@ pragma solidity >=0.8.23 <0.9.0;
 contract Error {
     error OnlyStakeRegistry();
     error InvalidValue();
+    error WithdrawalFailed();
 }
