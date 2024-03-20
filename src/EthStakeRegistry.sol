@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.23 <0.9.0;
 
+import { ExcessivelySafeCall } from "../lib/ExcessivelySafeCall/src/ExcessivelySafeCall.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
 import { IBlast } from "./interface/IBlast.sol";
@@ -12,6 +13,8 @@ import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC16
 import { Error } from "./utils/Error.sol";
 
 contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
+    using ExcessivelySafeCall for address;
+
     IBlast public immutable BLAST;
     IBlastPoints public immutable BLAST_POINTS;
     address public immutable STAKING_CONTRACT_IMPLEMENTATION;
@@ -111,7 +114,9 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
 
     function _beforeStake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-            (bool success, ) = service.call(abi.encodeWithSelector(IEthStakeHooks.beforeStake.selector, user, amount, data));
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.beforeStake.selector, user, amount, data)
+            );
             if (!success) {
                 emit Log("beforeStakeError");
             }
@@ -120,28 +125,34 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
 
     function _afterStake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-			(bool success, ) = service.call(abi.encodeWithSelector(IEthStakeHooks.afterStake.selector, user, amount, data));
-			if (!success) {
-				emit Log("afterStakeError");
-			}
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.afterStake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("afterStakeError");
+            }
         }
     }
 
     function _beforeUnstake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-			(bool success, ) = service.call(abi.encodeWithSelector(IEthStakeHooks.beforeUnstake.selector, user, amount, data));
-			if (!success) {
-				emit Log("beforeUnstakeError");
-			}
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.beforeUnstake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("beforeUnstakeError");
+            }
         }
     }
 
     function _afterUnstake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-			(bool success, ) = service.call(abi.encodeWithSelector(IEthStakeHooks.afterUnstake.selector, user, amount, data));
-			if (!success) {
-				emit Log("afterUnstakeError");
-			}
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.afterUnstake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("afterUnstakeError");
+            }
         }
     }
 }
