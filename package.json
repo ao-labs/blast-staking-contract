@@ -1,15 +1,19 @@
 {
   "name": "blast-staking-contract",
   "description": "Staking contracts for services on BLAST",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "contributors": [
     {
       "name": "Pluto Han",
       "url": "https://github.com/PlutoHan"
     },
     {
-      "name": "Paul Razvan Berg",
-      "url": "https://github.com/PaulRBerg"
+      "name": "Taek Lee",
+      "url": "https://twitter.com/leekt216"
+    },
+    {
+      "name": "ChainLight",
+      "url": "https://github.com/chainlight-io"
     }
   ],
   "dependencies": {
