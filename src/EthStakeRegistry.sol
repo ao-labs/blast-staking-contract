@@ -15,7 +15,7 @@ import { Error } from "./utils/Error.sol";
 
 contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     using ExcessivelySafeCall for address;
-    
+
     IBlast public immutable BLAST;
     IBlastPoints public immutable BLAST_POINTS;
     address public immutable STAKING_CONTRACT_IMPLEMENTATION;
