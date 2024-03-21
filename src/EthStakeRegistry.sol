@@ -13,7 +13,7 @@ import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC16
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { Error } from "./utils/Error.sol";
 
-contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
+contract EthStakeRegistry is IEthStakeRegistry, Ownable, ReentrancyGuard, Error {
     using ExcessivelySafeCall for address;
 
     IBlast public immutable BLAST;
