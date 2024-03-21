@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.23 <0.9.0;
 
+import { ExcessivelySafeCall } from "../lib/ExcessivelySafeCall/src/ExcessivelySafeCall.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
 import { IBlast } from "./interface/IBlast.sol";
@@ -12,7 +13,9 @@ import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC16
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { Error } from "./utils/Error.sol";
 
-contract EthStakeRegistry is ReentrancyGuard, IEthStakeRegistry, Ownable, Error {
+contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
+    using ExcessivelySafeCall for address;
+    
     IBlast public immutable BLAST;
     IBlastPoints public immutable BLAST_POINTS;
     address public immutable STAKING_CONTRACT_IMPLEMENTATION;
@@ -21,7 +24,6 @@ contract EthStakeRegistry is ReentrancyGuard, IEthStakeRegistry, Ownable, Error 
     event Stake(address indexed service, address indexed user, uint256 amount);
     event Unstake(address indexed service, address indexed user, address indexed to, uint256 amount);
     event Log(string reason);
-    event LogBytes(bytes reason);
 
     uint256 public constant MAX_GAS_LIMIT = 3_000_000;
 
@@ -112,56 +114,44 @@ contract EthStakeRegistry is ReentrancyGuard, IEthStakeRegistry, Ownable, Error 
 
     function _beforeStake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-            try IEthStakeHooks(service).beforeStake{ gas: MAX_GAS_LIMIT }(user, amount, data) returns (bool success) {
-                if (!success) {
-                    emit Log("error");
-                }
-            } catch Error(string memory reason) {
-                emit Log(reason);
-            } catch (bytes memory reason) {
-                emit LogBytes(reason);
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.beforeStake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("beforeStakeError");
             }
         }
     }
 
     function _afterStake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-            try IEthStakeHooks(service).afterStake{ gas: MAX_GAS_LIMIT }(user, amount, data) returns (bool success) {
-                if (!success) {
-                    emit Log("error");
-                }
-            } catch Error(string memory reason) {
-                emit Log(reason);
-            } catch (bytes memory reason) {
-                emit LogBytes(reason);
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.afterStake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("afterStakeError");
             }
         }
     }
 
     function _beforeUnstake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-            try IEthStakeHooks(service).beforeUnstake{ gas: MAX_GAS_LIMIT }(user, amount, data) returns (bool success) {
-                if (!success) {
-                    emit Log("error");
-                }
-            } catch Error(string memory reason) {
-                emit Log(reason);
-            } catch (bytes memory reason) {
-                emit LogBytes(reason);
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.beforeUnstake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("beforeUnstakeError");
             }
         }
     }
 
     function _afterUnstake(address service, address user, uint256 amount, bytes memory data) internal {
         if (ERC165Checker.supportsInterface(service, type(IEthStakeHooks).interfaceId)) {
-            try IEthStakeHooks(service).afterUnstake{ gas: MAX_GAS_LIMIT }(user, amount, data) returns (bool success) {
-                if (!success) {
-                    emit Log("error");
-                }
-            } catch Error(string memory reason) {
-                emit Log(reason);
-            } catch (bytes memory reason) {
-                emit LogBytes(reason);
+            (bool success,) = service.excessivelySafeCall(
+                MAX_GAS_LIMIT, 0, 0, abi.encodeWithSelector(IEthStakeHooks.afterUnstake.selector, user, amount, data)
+            );
+            if (!success) {
+                emit Log("afterUnstakeError");
             }
         }
     }

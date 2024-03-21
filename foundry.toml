@@ -14,6 +14,7 @@ script           = "script"
 solc             = "0.8.23"
 src              = "src"
 test             = "test"
+gas_limit        = 30303030
 
 [profile.ci]
 fuzz      = { runs = 10_000 }
