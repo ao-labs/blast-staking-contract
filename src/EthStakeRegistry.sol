@@ -10,11 +10,12 @@ import { EthStakingContract } from "./EthStakingContract.sol";
 import { IEthStakeRegistry } from "./interface/IEthStakeRegistry.sol";
 import { IEthStakeHooks } from "../src/interface/IEthStakeHooks.sol";
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import { Error } from "./utils/Error.sol";
 
 contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
     using ExcessivelySafeCall for address;
-
+    
     IBlast public immutable BLAST;
     IBlastPoints public immutable BLAST_POINTS;
     address public immutable STAKING_CONTRACT_IMPLEMENTATION;
@@ -34,7 +35,6 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
         address gasCollector,
         address pointsOperator
     )
-        payable
         Ownable(gasCollector)
     {
         STAKING_CONTRACT_IMPLEMENTATION = address(new EthStakingContract());
@@ -58,7 +58,7 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
 
     /* ============ External Functions ============ */
 
-    function stake(address service, bytes memory data) external payable {
+    function stake(address service, bytes memory data) external payable nonReentrant {
         if (msg.value == 0) {
             revert InvalidValue();
         }
@@ -72,7 +72,7 @@ contract EthStakeRegistry is IEthStakeRegistry, Ownable, Error {
         emit Stake(service, msg.sender, msg.value);
     }
 
-    function unstake(address service, address payable to, uint256 amount, bytes memory data) external {
+    function unstake(address service, address payable to, uint256 amount, bytes memory data) external nonReentrant {
         if (amount == 0) {
             revert InvalidValue();
         }
