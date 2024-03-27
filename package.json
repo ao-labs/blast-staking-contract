@@ -17,6 +17,7 @@
     }
   ],
   "dependencies": {
+    "@nomad-xyz/excessively-safe-call": "git@github.com:nomad-xyz/ExcessivelySafeCall.git",
     "@openzeppelin/contracts": "^5.0.1"
   },
   "devDependencies": {

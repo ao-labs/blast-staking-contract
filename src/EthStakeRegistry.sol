@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.23 <0.9.0;
 
-import { ExcessivelySafeCall } from "../lib/ExcessivelySafeCall/src/ExcessivelySafeCall.sol";
+import { ExcessivelySafeCall } from "@nomad-xyz/excessively-safe-call/ExcessivelySafeCall.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
 import { IBlast } from "./interface/IBlast.sol";
