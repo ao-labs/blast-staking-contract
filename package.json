@@ -1,7 +1,7 @@
 {
   "name": "blast-staking-contract",
   "description": "Staking contracts for services on BLAST",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "contributors": [
     {
       "name": "Pluto Han",
