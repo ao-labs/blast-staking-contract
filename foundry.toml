@@ -34,4 +34,5 @@ tab_width             = 4
 wrap_comments         = true
 
 [rpc_endpoints]
-blast_sepolia = "${BLAST_RPC_URL}"
+blast         = "${BLAST_RPC_URL}"
+blast_sepolia = "${BLAST_SEPOLIA_RPC_URL}"

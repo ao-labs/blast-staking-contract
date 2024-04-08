@@ -5,7 +5,9 @@ node_modules
 out
 
 # files
-*.env
+.env
+.env.dev
+.env.prod
 *.log
 .DS_Store
 .pnp.*

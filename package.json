@@ -45,6 +45,8 @@
     "test": "forge test",
     "test:coverage": "forge coverage",
     "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
-    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url blast_sepolia --broadcast --verify --skip-simulation -vvv"
+    "deploy": "forge script script/Deploy.s.sol --rpc-url blast --broadcast --verify --skip-simulation -vvv",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url blast_sepolia --broadcast --verify --skip-simulation -vvv",
+    "hashes": "solc --hashes --include-path node_modules/ --base-path . src/utils/Error.sol"
   }
 }
